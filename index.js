@@ -1,12 +1,19 @@
 require("dotenv").config();
 
-const express = require("express");
 
+// framework
+const express = require("express");
 const mongoose = require("mongoose");
 
 
 // importing the database from the database folder 
 const database = require("./database/index");
+
+// models
+
+const BookModel = require("./database/book");
+const AuthorModel = require("./database/author");
+const PublicationModel = require("./database/publication");
 
 
 // initializing express
@@ -16,6 +23,7 @@ const shapeAI = express();
 // configurations
 shapeAI.use(express.json());
 
+// connecting mongoose to our database
 mongoose.connect(process.env.MONGO_URL , 
 {
   useNewUrlParser: true,

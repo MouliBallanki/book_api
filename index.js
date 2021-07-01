@@ -46,8 +46,9 @@ method       get
 
 */
 
-shapeAI.get("/" ,(req ,res) =>{
-    return res.json({books :database.books});
+shapeAI.get("/" ,async (req ,res) =>{
+    const getAllBooks = await BookModel.find();
+    return res.json({getAllBooks});
 });
 
 
@@ -60,10 +61,11 @@ method       get
 
 */
 
-shapeAI.get("/is/:isbn" ,(req , res) =>{
-    const getSpecificBook = database.books.filter((book) => book.ISBN === req.params.isbn);
+shapeAI.get("/is/:isbn" ,async (req , res) =>{
+    const getSpecificBook = await BookModel.findOne({ISBN :req.params.isbn});
+    // const getSpecificBook = database.books.filter((book) => book.ISBN === req.params.isbn);
 
-    if(getSpecificBook.length === 0){
+    if(!getSpecificBook){
         res.json({error :`No BOOK found for the ISBN of ${req.params.isbn}`});
     }
     else{
@@ -82,10 +84,13 @@ method       get
 
 */
 
-shapeAI.get("/c/:category" ,(req ,res) =>{
-    const getSpecificBooks = database.books.filter((book) => book.category.includes(req.params.category));
+shapeAI.get("/c/:category" ,async (req ,res) =>{
 
-    if(getSpecificBooks.length === 0){
+    const getSpecificBooks = await BookModel.findOne({category : req.params.category});
+
+    // const getSpecificBooks = database.books.filter((book) => book.category.includes(req.params.category));
+
+    if(!getSpecificBooks){
         res.json({error :`No BOOK found for the category of ${req.params.category}`});
     }
     else{
@@ -103,10 +108,12 @@ parameters   author
 method       get
 
 */
-shapeAI.get("/c/is/:id" ,(req ,res) => {
-    const getSpecificBooks = database.books.filter((book) => book.authors.includes(parseInt(req.params.id)));
+shapeAI.get("/c/is/:id" ,async (req ,res) => {
 
-    if(getSpecificBooks.length === 0){
+    const getSpecificBooks = await BookModel.find({authors : req.params.id});
+    // const getSpecificBooks = database.books.filter((book) => book.authors.includes(parseInt(req.params.id)));
+
+    if(!getSpecificBooks){
         res.json({error :`No BOOK found for the author of ${req.params.id}`});
     }
     else{
@@ -124,8 +131,9 @@ method       get
 
 */
 
-shapeAI.get("/authors", (req ,res) =>{
-    res.json({authors :database.authors});
+shapeAI.get("/authors", async (req ,res) =>{
+    const getAllAuthors = await AuthorModel.find();
+    res.json({authors : getAllAuthors});
 });
 
 
@@ -139,11 +147,12 @@ method       get
 
 */
 
-shapeAI.get("/authors/:author" ,(req ,res) =>{
+shapeAI.get("/authors/:author" ,async (req ,res) =>{
  
-    const getSpecificAuthor = database.authors.filter((author) => author.name.includes(req.params.author));
+    const getSpecificAuthor = await AuthorModel.findOne({name : req.params.author});
+    // const getSpecificAuthor = database.authors.filter((author) => author.name.includes(req.params.author));
 
-    if(getSpecificAuthor.length ===0){
+    if(!getSpecificAuthor){
         res.json({error : `No author found by ${req.params.author}`});
     }
 
@@ -162,9 +171,11 @@ method       get
 
 */
 
-shapeAI.get("/author/:isbn" ,(req ,res) =>{
-    const getSpecificAuthors = database.authors.filter((author)=> author.books.includes(req.params.isbn));
-    if(getSpecificAuthors.length === 0){
+shapeAI.get("/author/:isbn" ,async (req ,res) =>{
+
+    const getSpecificAuthors = await AuthorModel.find({books : req.params.isbn});
+    // const getSpecificAuthors = database.authors.filter((author)=> author.books.includes(req.params.isbn));
+    if(!getSpecificAuthors){
         res.json({error : `No author found by that ${req.params.isbn} ISBN number`});
     }
     else{
@@ -186,8 +197,10 @@ method       get
 */
 
 
-shapeAI.get("/publications" ,(req ,res) =>{
-    res.json({publications :database.publications});
+shapeAI.get("/publications" ,async (req ,res) =>{
+
+    const getAllPublications = await PublicationModel.find();
+    res.json({publications :getAllPublications});
 });
 
 
@@ -200,14 +213,15 @@ method       get
 
 */
 
-shapeAI.get("/publications/is/:pubname" ,(req ,res) =>{
-    const getSpecificPublications = database.publications.filter((pname) => pname.name.includes(req.params.pubname));
+shapeAI.get("/publications/is/:pubname" ,async (req ,res) =>{
+    const getSpecificPublication = await PublicationModel.findOne({ name : req.params.pubname});
+    // const getSpecificPublications = database.publications.filter((pname) => pname.name.includes(req.params.pubname));
 
-    if(getSpecificPublications.length === 0){
+    if(!getSpecificPublication){
         res.json({error :`there is no publication found by the ${req.params.pubname}`});
     }
     else{
-        res.json({publications :getSpecificPublications});
+        res.json({publications :getSpecificPublication});
     }
 });
 
@@ -223,14 +237,16 @@ method       get
 */
 
 
-shapeAI.get("/publications/:isbn" ,(req ,res) =>{
-    const getSpecificPublications = database.publications.filter((pname) => pname.books.includes(req.params.isbn));
+shapeAI.get("/publications/:isbn" ,async (req ,res) =>{
 
-    if(getSpecificPublications.length === 0){
+    const getSpecificPublication = await PublicationModel.find({books : req.params.isbn});
+    // const getSpecificPublications = database.publications.filter((pname) => pname.books.includes(req.params.isbn));
+
+    if(!getSpecificPublication){
         res.json({error :`there is no publication found by the ${req.params.isbn}`});
     }
     else{
-        res.json({publications :getSpecificPublications});
+        res.json({publication :getSpecificPublication});
     }
 });
 
@@ -244,11 +260,11 @@ method       POST
 
 */
 
-shapeAI.post("/book/new" ,(req ,res) =>{
+shapeAI.post("/book/new" ,async (req ,res) =>{
     const {newBook} = req.body;
-    database.books.push(newBook);
+    BookModel.create(newBook);
 
-    return res.json({books : database.books , message : "book was added "});
+    return res.json({message: "book was added "});
 });
 
 
@@ -263,9 +279,9 @@ method       POST
 
 shapeAI.post("/author/new" ,(req , res) =>{
     const { newAuthor } = req.body;
-    database.authors.push(newAuthor);
+    AuthorModel.create(newAuthor);
     
-    return res.json({authors : database.authors  , message : "author was added"});
+    return res.json({ message : "author was added"});
 });
 
 /* 
@@ -279,9 +295,9 @@ method       POST
 
 shapeAI.post("/publication/new" , (req , res) =>{
     const { newPublication } = req.body;
-    database.publications.push(newPublication);
+    PublicationModel.create(newPublication);
 
-    return res.json({publications : database.publications , Message : "new publicaton was added"});
+    return res.json({Message : "new publicaton was added"});
 });
 
 

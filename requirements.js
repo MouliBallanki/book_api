@@ -11,20 +11,21 @@
 // Publications
 // Name, Id, Books[]
 
-// Requirements
+// Requirements 1 means general API
+// 2 means MogoDB API
 
 // Books
 
 // GET
 // We need an API
-// to get all books  1
-// to get specific book   1
-// to get a list of books based on category 1
-// to get a list of books based on author -> [Task]🔥 1
+// to get all books  1 2
+// to get specific book   1 2
+// to get a list of books based on category 1 2
+// to get a list of books based on author -> [Task]🔥 1 2
 
 
 // POST
-// New Book 1
+// New Book 1 2
 
 // PUT
 // Update book details 1
@@ -44,9 +45,9 @@
 
 // GET
 // We need an API
-// to get all authors 1
-// to get specific author [Task]🔥  1
-// to get a list of authors based on a book.  1
+// to get all authors 1 2
+// to get specific author [Task]🔥  1 2
+// to get a list of authors based on a book.  1 2
 
 // POST
 // New Author 1
@@ -64,9 +65,9 @@
 
 // GET
 // We need an API
-// to get all publications  1
-// to get specific publication [Task]1
-// to get a list of publications based on a book. [Task] 1
+// to get all publications  1 2
+// to get specific publication [Task]1 2
+// to get a list of publications based on a book. [Task] 1 2
 
 // POST
 // Add new publication [task] 1

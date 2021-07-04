@@ -14,6 +14,7 @@ const database = require("./database/index");
 const BookModel = require("./database/book");
 const AuthorModel = require("./database/author");
 const PublicationModel = require("./database/publication");
+const { parse } = require("dotenv");
 
 
 // initializing express
@@ -303,7 +304,7 @@ shapeAI.post("/publication/new" , (req , res) =>{
 
 /* 
 route         /book/update
-decription   to add new publications
+decription   to add new title
 acess        PUBLIC
 parameters   isbn
 method       PUT
@@ -311,16 +312,28 @@ method       PUT
 */
 
 
-shapeAI.put("/book/update/:isbn" , (req , res ) =>{
-    database.books.forEach((book) =>{
-        if (book.ISBN === req.params.isbn){
-            book.title = req.body.newTitle;
+shapeAI.put("/book/update/:isbn" , async (req , res ) =>{
 
-            return;
+    const updatedBook = await BookModel.findOneAndUpdate(
+        {
+            ISBN : req.params.isbn,
+        },
+        {
+            title :req.body.newTitle,
+        },
+        {
+            new: true,
         }
-    });
+    );
+    // database.books.forEach((book) =>{
+    //     if (book.ISBN === req.params.isbn){
+    //         book.title = req.body.newTitle;
 
-    return res.json({ Books : database.books });
+    //         return;
+    //     }
+    // });
+
+    return res.json({ Books : updatedBook });
 });
 
 /* 
@@ -332,22 +345,50 @@ method       PUT
 
 */
 
-shapeAI.put("/book/author/update/:isbn" , (req ,res) =>{
+shapeAI.put("/book/author/update/:isbn" , async (req ,res) =>{
     // update book details 
-    database.books.forEach((book) =>{
-        if(book.ISBN === req.params.isbn){
-            book.authors.push(req.body.newAuthor);
+
+    const updatedBooks = await BookModel.findOneAndUpdate(
+        {
+            ISBN:req.params.isbn,
+        },
+        {
+            $addToSet: {
+                authors : req.body.newAuthor,
+            }
+        },
+        {
+            new:true,
         }
-    });
+    );
+    // database.books.forEach((book) =>{
+    //     if(book.ISBN === req.params.isbn){
+    //         book.authors.push(req.body.newAuthor);
+    //     }
+    // });
 
     // update author details
-    database.authors.forEach((author) =>{
-        if(author.id === req.body.newAuthor){
-            author.books.push(req.params.isbn);
-        }
-    });
 
-    return res.json({ books : database.books , authors : database.authors , message : "new author was added "});
+    const updatedAuthors = await AuthorModel.findOneAndUpdate(
+        {
+            id :req.body.newAuthor,
+        },
+        {
+            $addToSet : {
+                books : req.params.isbn,
+            }
+        },
+        {
+            new :true,
+        }
+    );
+    // database.authors.forEach((author) =>{
+    //     if(author.id === req.body.newAuthor){
+    //         author.books.push(req.params.isbn);
+    //     }
+    // });
+
+    return res.json({ books : updatedBooks , authors : updatedAuthors , message : "new author was added "});
 });
 
 
@@ -361,16 +402,28 @@ method       PUT
 
 */
 
-shapeAI.put("/author/update/:c" , (req , res ) =>{
-    database.authors.forEach((author) =>{
-        if (author.id === parseInt(req.params.c)){
-            author.name = req.body.newTitle;
+shapeAI.put("/author/update/:c" , async (req , res ) =>{
 
-            return;
+    const updatedAuthor = await AuthorModel.findOneAndUpdate(
+        {
+            id :req.params.c,
+        },
+        {
+            name : req.body.newAuthor,
+        },
+        {
+            new: true,
         }
-    });
+    );
+    // database.authors.forEach((author) =>{
+    //     if (author.id === parseInt(req.params.c)){
+    //         author.name = req.body.newTitle;
 
-    return res.json({ Authors : database.authors });
+    //         return;
+    //     }
+    // });
+
+    return res.json({ Authors : updatedAuthor });
 });
 
 
@@ -386,16 +439,30 @@ method       PUT
 */
 
 
-shapeAI.put("/publications/update/:c" , (req , res ) =>{
-    database.publications.forEach((publication) =>{
-        if (publication.id === parseInt(req.params.c)){
-            publication.name = req.body.newTitle;
+shapeAI.put("/publications/update/:id" , async (req , res ) =>{
 
-            return;
+    const updatedPublications = await  PublicationModel.findOneAndUpdate(
+        {
+            id :req.params.id,
+        },
+        {
+            name : req.body.newTitle,
+        },
+        {
+            new :true,
         }
-    });
+    );
 
-    return res.json({ publications : database.publications });
+    return res.json({ publications : updatedPublications});
+    // database.publications.forEach((publication) =>{
+    //     if (publication.id === parseInt(req.params.id)){
+    //         publication.name = req.body.newTitle;
+
+    //         return;
+    //     }
+    // });
+
+    // return res.json({ publications : database.publications });
 });
 
 /* 
@@ -407,23 +474,51 @@ method       PUT
 
 */
 
-shapeAI.put("/publications/update/book/:isbn/:pubId", (req, res) =>{
+shapeAI.put("/publications/update/book/:isbn/:pubId", async (req, res) =>{
+
     // update publications
-    database.publications.forEach((publication) =>{
-        if(publication.id === parseInt(req.params.pubId)){
-            return publication.books.push(req.params.isbn);
+    const updatedPublications = await PublicationModel.findOneAndUpdate(
+        {
+            id :req.params.pubId,
+        },
+        {
+            $addToSet:{
+                books :req.params.isbn,
+            },
+        },
+        {
+            new:true,
         }
-    });
+    );
+    // database.publications.forEach((publication) =>{
+    //     if(publication.id === parseInt(req.params.pubId)){
+    //         return publication.books.push(req.params.isbn);
+    //     }
+    // });
 
     // update books
-    database.books.forEach((book) =>{
-        if(book.ISBN === req.params.isbn){
-            book.publication.push(parseInt(req.params.pubId));
-            return;
-        }
-    });
 
-    res.json({message : "new publication added" , books : database.books , publications : database.publications});
+    const updatedBooks = await BookModel.findOneAndUpdate(
+        {
+            ISBN:req.params.isbn,
+        },
+        {
+            $addToSet:{
+                publication:req.params.pubId,
+            },
+        },
+        {
+            new:true,
+        }
+    );
+    // database.books.forEach((book) =>{
+    //     if(book.ISBN === req.params.isbn){
+    //         book.publication.push(parseInt(req.params.pubId));
+    //         return;
+    //     }
+    // });
+
+    res.json({ message : "added..", books :updatedBooks , publications : updatedPublications });
 });
 
 
@@ -437,12 +532,18 @@ method       DELETE
 
 */
 
-shapeAI.delete("/book/delete/:isbn" , (req ,res) =>{
-    const updatedBookDatabase = database.books.filter((book) => book.ISBN !== req.params.isbn);
+shapeAI.delete("/book/delete/:isbn" , async (req ,res) =>{
 
-    database.books = updatedBookDatabase;
+    const updatedBookDatabase = await BookModel.findOneAndDelete(
+        {
+            ISBN:req.params.isbn,
+        },
+    );
+    // const updatedBookDatabase = database.books.filter((book) => book.ISBN !== req.params.isbn);
 
-    return res.json({ books :database.books});
+    // database.books = updatedBookDatabase;
+
+    return res.json({ books :updatedBookDatabase});
 });
 
 /* 
@@ -454,28 +555,55 @@ method       DELETE
 
 */
 
-shapeAI.delete("/book/delete/author/:isbn/:authorId" , (req ,res) =>{
-    database.books.forEach((book) =>{
-        if(book.ISBN === req.params.isbn){
-            const newAuthorList = book.authors.filter((author) => author !== parseInt(req.params.authorId));
+shapeAI.delete("/book/delete/author/:isbn/:authorId" , async (req ,res) =>{
 
-            book.authors = newAuthorList;
-            return ;
+    const updatedBookDatabase = await BookModel.findOneAndUpdate(
+        {
+            ISBN:req.params.isbn,
+        },
+        {
+            $pull:{
+                authors :parseInt(req.params.authorId),
+            }
+        },
+        {
+            new:true,
         }
+    );
+    // database.books.forEach((book) =>{
+    //     if(book.ISBN === req.params.isbn){
+    //         const newAuthorList = book.authors.filter((author) => author !== parseInt(req.params.authorId));
+
+    //         book.authors = newAuthorList;
+    //         return ;
+    //     }
         
-    });
+    // });
 
+    const updatedAuthorDatabase = await AuthorModel.findOneAndUpdate(
+        {
+            id:parseInt(req.params.authorId),
+        },
 
-    database.authors.forEach((author) => {
-        if(author.id === parseInt(req.params.authorId)){
-            const newBookList = author.books.filter((book) => book !== req.params.isbn)
-
-            author.books = newBookList ;
-            return;
+        {
+            $pull:{
+                books:req.params.isbn,
+            }
+        },
+        {
+            new:true,
         }
-    });
+    );
+    // database.authors.forEach((author) => {
+    //     if(author.id === parseInt(req.params.authorId)){
+    //         const newBookList = author.books.filter((book) => book !== req.params.isbn)
 
-    return res.json({ books :database.books , authors : database.authors});
+    //         author.books = newBookList ;
+    //         return;
+    //     }
+    // });
+
+    return res.json({ books :updatedBookDatabase , authors : updatedAuthorDatabase});
 
 });
 
@@ -488,12 +616,19 @@ method       DELETE
 
 */
 
-shapeAI.delete("/author/delete/:authorId" , (req ,res) =>{
-    const newAuthorDatabase = database.authors.filter((author) => author.id !== parseInt(req.params.authorId))
+shapeAI.delete("/author/delete/:authorId" , async (req ,res) =>{
 
-    database.authors = newAuthorDatabase;
+    const updatedAuthorDatabase = await AuthorModel.findOneAndDelete(
+        {
+            id :parseInt(req.params.authorId),
+        },
+    );
 
-    res.json({ authors : database.authors});
+    // const newAuthorDatabase = database.authors.filter((author) => author.id !== parseInt(req.params.authorId))
+
+    // database.authors = newAuthorDatabase;
+
+    res.json({ authors : updatedAuthorDatabase});
 });
 
 /* 
@@ -505,12 +640,18 @@ method       DELETE
 
 */
 
-shapeAI.delete("/publication/delete/:pubId" , (req ,res) =>{
-    const newPublicationDatabase = database.publications.filter((publication) => publication.id !== parseInt(req.params.pubId))
+shapeAI.delete("/publication/delete/:pubId" , async (req ,res) =>{
 
-    database.publications = newPublicationDatabase;
+    const updatedPublication = await PublicationModel.findOneAndDelete(
+        {
+            id:parseInt(req.params.pubId),
+        }
+    );
+    // const newPublicationDatabase = database.publications.filter((publication) => publication.id !== parseInt(req.params.pubId))
 
-    res.json({ publications : database.publications});
+    // database.publications = newPublicationDatabase;
+
+    res.json({ publications : updatedPublication});
 });
 
 /* 
@@ -522,29 +663,56 @@ method       DELETE
 
 */
 
-shapeAI.delete("/publication/delete/book/:isbn/:pubId", (req ,res) =>{
+shapeAI.delete("/publication/delete/book/:isbn/:pubId", async (req ,res) =>{
     // update publication books database
-    database.publications.forEach((publication) =>{
-        if(publication.id ===parseInt(req.params.pubId)){
-            const updatedBooks = publication.books.filter((book) => book !== req.params.isbn);
-
-            publication.books = updatedBooks;
-            return ;
+    const updatedPublications = await PublicationModel.findOneAndUpdate(
+        {
+            id:parseInt(req.params.pubId),
+        },
+        {
+            $pull:{
+                books :req.params.isbn,
+            }
+        },
+        {
+            new:true,
         }
-    });
+    );
+    // database.publications.forEach((publication) =>{
+    //     if(publication.id ===parseInt(req.params.pubId)){
+    //         const updatedBooks = publication.books.filter((book) => book !== req.params.isbn);
+
+    //         publication.books = updatedBooks;
+    //         return ;
+    //     }
+    // });
 
     // update publication in book database
 
-    database.books.forEach((book) =>{
-        if(book.ISBN === req.params.isbn){
-            const updatedPublication = book.publication.filter((pub) => 
-            pub !== parseInt(req.params.pubId))
-            book.publication = updatedPublication ;
-            return;
+    const updatedBookDatabase = await BookModel.findOneAndUpdate(
+        {
+            ISBN:req.params.isbn,
+        },
+        {
+            $pull:{
+                publication:req.params.pubId,
+            }
+        },
+        {
+            new:true,
         }
-    });
+    );
 
-    res.json({ books : database.books , publications : database.publications});
+    // database.books.forEach((book) =>{
+    //     if(book.ISBN === req.params.isbn){
+    //         const updatedPublication = book.publication.filter((pub) => 
+    //         pub !== parseInt(req.params.pubId))
+    //         book.publication = updatedPublication ;
+    //         return;
+    //     }
+    // });
+
+    res.json({ books : updatedBookDatabase, publications : updatedPublications});
 });
 
 

@@ -28,12 +28,12 @@
 // New Book 1 2
 
 // PUT
-// Update book details 1
-// update/add new author 1
+// Update book details 1 2
+// update/add new author 1 2
 
 // DELETE
-// delete a book 1
-// delete a author from a book 1
+// delete a book 1 2
+// delete a author from a book 1 2
 
 // --------------------------------------------------------------------------------
 

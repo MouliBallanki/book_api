@@ -70,12 +70,12 @@
 // to get a list of publications based on a book. [Task] 1 2
 
 // POST
-// Add new publication [task] 1
+// Add new publication [task] 1 2
 
 // PUT
-// update publication name using id [Task] 1
-// update/add new book to an publication  1
+// update publication name using id [Task] 1 2
+// update/add new book to an publication  1 2
 
 // DELETE
-// delete a book from publication 1
-// delete a publication 1
+// delete a book from publication 1 2
+// delete a publication 1 2

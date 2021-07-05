@@ -4,9 +4,21 @@ const mongoose = require("mongoose");
 
 const PublicationSchema = mongoose.Schema(
     {
-        id :Number,
-        name :String,
-        books :[String],
+        id :{
+            type:Number,
+            required:true,
+            maxLength:2,
+        },
+        name :{
+            type:String,
+            required:true,
+            minLength:15,
+            maxLength:18,
+        },
+        books :{
+            type:[String],
+            required:true,
+        }
     });
 
 const PublicationModel = mongoose.model("publications" ,PublicationSchema);

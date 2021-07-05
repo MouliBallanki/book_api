@@ -4,7 +4,7 @@ let books = [
         title :"getting started with mern",
         authors:[1,2],
         language :"en",
-        pubDate :"2021-07-07",
+        pubDate :"2021-07-07",z
         numPage :225,
         category :["fiction","programming","web dev","tech"],
         publication :[1,2]

@@ -20,11 +20,6 @@ const { parse } = require("dotenv");
 // initializing express
 const shapeAI = express();
 
-// intializing micro services for a book
-shapeAI.use("/book",Books);
-shapeAI.use("/author",Authors);
-shapeAI.use("/Publication",Publications);
-
 // configurations
 shapeAI.use(express.json());
 
@@ -39,6 +34,10 @@ mongoose.connect(process.env.MONGO_URL ,
 )
 .then(() => console.log("coonection established!!"));
 
+// intializing micro services for a book
+shapeAI.use("/book",Books);
+shapeAI.use("/author",Authors);
+shapeAI.use("/Publication",Publications);
 
 shapeAI.listen(3000 ,() => console.log("server is runnig!!!"));
 
